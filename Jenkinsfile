@@ -45,15 +45,16 @@ pipeline {
         }
         
         stage('Docker Push') {
-            environment {
-                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // Secret Jenkins pour mot de passe DockerHub
-            }
+
             steps {
+
                 script {
-                    sh '''
-                    docker login -u $DOCKER_ID -p $DOCKER_PASS
-                    docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
-                    '''
+                    withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_PASS', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+                       
+                        '''
                 }
             }
         }
