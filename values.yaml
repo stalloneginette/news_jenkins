@@ -1,0 +1,78 @@
+# values.yaml pour le chart Helm
+
+# Application
+replicaCount: 1
+image:
+  repository: your-dockerhub-username/jenkins-devops-app
+  tag: latest
+  pullPolicy: Always
+
+# Environnement (sera remplacé dynamiquement)
+environment: dev
+
+# Configuration du service
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8081
+
+# Configuration des ressources
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Configuration de l'ingress
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+# Configuration des variables d'environnement
+env:
+  - name: APP_ENV
+    value: "{{ .Values.environment }}"
+  - name: DB_HOST
+    value: "db-{{ .Values.environment }}"
+  - name: REDIS_HOST
+    value: "redis-{{ .Values.environment }}"
+
+# Configuration spécifique à chaque environnement
+environments:
+  dev:
+    ingress:
+      host: dev.app.example.com
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+  qa:
+    ingress:
+      host: qa.app.example.com
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  staging:
+    ingress:
+      host: staging.app.example.com
+    resources:
+      limits:
+        cpu: 750m
+        memory: 768Mi
+  prod:
+    replicaCount: 3
+    ingress:
+      host: app.example.com
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1024Mi
