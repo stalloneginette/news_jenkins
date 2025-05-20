@@ -14,7 +14,7 @@ pipeline {
                 script {
                     sh '''
                     cd app/
-                    python -m pytest
+                    python3 -m pytest
                     '''
                 }
             }
