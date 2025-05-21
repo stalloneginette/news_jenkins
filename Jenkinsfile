@@ -5,9 +5,7 @@ pipeline {
         DOCKER_IMAGE = "fastapi-app"
         DOCKER_TAG = "v.${BUILD_ID}.0" // Tag incrémental pour chaque build
     }
-    
     agent any
-    
     stages {
         stage('Test') {
             steps {
@@ -19,7 +17,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Docker Build') {
             steps {
                 script {
@@ -29,7 +26,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Docker Run & Test') {
             steps {
                 script {
@@ -43,22 +39,18 @@ pipeline {
                 }
             }
         }
-        
         stage('Docker Push') {
-
             steps {
-
                 script {
                     withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_PASS', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
-                       
                         '''
+                    } // Accolade fermante manquante pour withCredentials
                 }
             }
         }
-        
         stage('Déploiement en DEV') {
             environment {
                 KUBECONFIG = credentials("config") // Secret Jenkins pour la config Kubernetes
@@ -76,10 +68,9 @@ pipeline {
                 }
             }
         }
-        
         stage('Déploiement en QA') {
             when {
-                expression { 
+                expression {
                     return env.BRANCH_NAME ==~ /PR-.*/ || env.CHANGE_TARGET == 'master'
                 }
             }
@@ -99,7 +90,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Déploiement en STAGING') {
             when {
                 expression { return env.BRANCH_NAME == 'master' }
@@ -120,7 +110,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Déploiement en PRODUCTION') {
             when {
                 expression { return env.BRANCH_NAME == 'master' }
@@ -133,7 +122,6 @@ pipeline {
                 timeout(time: 15, unit: "MINUTES") {
                     input message: 'Voulez-vous déployer en production ?', ok: 'Oui'
                 }
-                
                 script {
                     sh '''
                     rm -Rf .kube
@@ -147,7 +135,6 @@ pipeline {
             }
         }
     }
-    
     post {
         always {
             // Nettoyage
