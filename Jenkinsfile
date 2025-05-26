@@ -141,12 +141,14 @@ pipeline {
     post {
         always {
             // Nettoyage des images Docker locales
-            node {
-                script {
+            script {
+                try {
                     sh """
                         docker system prune -f
                     """
                     echo "🧹 Nettoyage terminé"
+                } catch (Exception e) {
+                    echo "⚠️ Erreur lors du nettoyage: ${e.getMessage()}"
                 }
             }
         }
