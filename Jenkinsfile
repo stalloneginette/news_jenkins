@@ -141,11 +141,13 @@ pipeline {
     post {
         always {
             // Nettoyage des images Docker locales
-            script {
-                sh """
-                    docker system prune -f
-                """
-                echo "🧹 Nettoyage terminé"
+            node {
+                script {
+                    sh """
+                        docker system prune -f
+                    """
+                    echo "🧹 Nettoyage terminé"
+                }
             }
         }
         success {
