@@ -4,9 +4,6 @@ pipeline {
         DOCKER_IMAGE_MOVIE = 'tstallone/movie-service'
         DOCKER_IMAGE_CAST = 'tstallone/cast-service'
         DOCKER_TAG = "v.${env.BUILD_NUMBER}.0"
-        // Définir si on a les credentials disponibles
-        HAS_DOCKER_CREDS = credentials('dockerhub-credentials') ?: 'false'
-        HAS_K8S_CREDS = credentials('kubeconfig-credentials') ?: 'false'
     }
     stages {
         stage('Test') {
